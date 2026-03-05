@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-   "dev": "npx tsx watch src/serve.ts"
+    "dev": "npx tsx watch src/serve.ts",
+    "format": "prettier --write src/**/*.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
+    "prettier": "3.8.1",
     "tsx": "^4.21.0"
   }
 }
