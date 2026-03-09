@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Genre {
+  id     Int      @id @default(autoincrement())
+  name   String?  @db.VarChar(100)
+  movies Movie[]
+}
+
+model Language {
+  id     Int      @id @default(autoincrement())
+  name   String   @db.VarChar(50)
+  movies Movie[]
+}
+
+model Movie {
+  id           Int        @id @default(autoincrement())
+  title        String?    @db.VarChar(100)
+  release_date DateTime?  @db.Date
+  genre        String?    @db.VarChar(50)
+  language     String?    @db.VarChar(50)
+  oscar_count  Int?
+  genre_id     Int?
+  language_id  Int?
+  genres       Genre?    @relation(fields: [genre_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_genre")
+  languages    Language? @relation(fields: [language_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_language")
+}
