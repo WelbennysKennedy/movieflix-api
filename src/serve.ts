@@ -65,48 +65,72 @@ app.post('/movies', async (req, res) => {
 })
 
 app.put('/movies/:id', async (req, res) => {
-        const id = Number(req.params.id)
+    const id = Number(req.params.id)
 
-        try {
-                const result = await prisma.movies.updateMany({
-                        where: { id },
-                        data: {
-                                release_date: new Date(req.body.release_date),
-                        },
-                })
+    try {
+        const result = await prisma.movies.updateMany({
+            where: { id },
+            data: {
+                release_date: new Date(req.body.release_date),
+            },
+        })
 
-                if (result.count === 0) {
-                        return res.status(404).json({ error: 'Movie not found' })
-                }
-
-                const updatedMovie = await prisma.movies.findUnique({
-                        where: { id },
-                })
-
-                return res.status(200).json(updatedMovie)
-        } catch (error) {
-                return res.status(500).json({
-                        error: 'An error occurred while updating the movie.',
-                })
+        if (result.count === 0) {
+            return res.status(404).json({ error: 'Movie not found' })
         }
+
+        const updatedMovie = await prisma.movies.findUnique({
+            where: { id },
+        })
+
+        return res.status(200).json(updatedMovie)
+    } catch (error) {
+        return res.status(500).json({
+            error: 'An error occurred while updating the movie.',
+        })
+    }
 })
 
 app.delete('/movies/:id', async (req, res) => {
-        const id = Number(req.params.id);
+    const id = Number(req.params.id)
 
-        try {
-        const movie = await prisma.movies.findUnique({ where: { id } });
+    try {
+        const movie = await prisma.movies.findUnique({ where: { id } })
         if (!movie) {
-            return res.status(404).json({ error: 'Movie not found' });
+            return res.status(404).json({ error: 'Movie not found' })
         }
 
-        await prisma.movies.delete({where: {id}})
+        await prisma.movies.delete({ where: { id } })
         res.status(204).send()
-        } catch (error) {
-        res.status(500).json({ error: 'An error occurred while deleting the movie.' });
-        }
-           });
+    } catch (error) {
+        res.status(500).json({
+            error: 'An error occurred while deleting the movie.',
+        })
+    }
+})
 
+app.get("/movies/:genreName", async (req, res) => {
+    
+    try {
+    const moviesFilteredbyGenreName = await prisma.movies.findMany({
+        include: {
+            genres: true,
+            languages: true,
+        },
+        where: {
+            genres: {
+                name: {
+                    equals: req.params.genreName,
+                    mode: "insensitive"
+                }
+            }
+        }
+    });
+    res.status(200).send(moviesFilteredbyGenreName);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
 
 
 
