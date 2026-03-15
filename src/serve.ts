@@ -91,6 +91,22 @@ app.put('/movies/:id', async (req, res) => {
         }
 })
 
+app.delete('/movies/:id', async (req, res) => {
+        const id = Number(req.params.id);
+
+        try {
+        const movie = await prisma.movies.findUnique({ where: { id } });
+        if (!movie) {
+            return res.status(404).json({ error: 'Movie not found' });
+        }
+
+        await prisma.movies.delete({where: {id}})
+        res.status(204).send()
+        } catch (error) {
+        res.status(500).json({ error: 'An error occurred while deleting the movie.' });
+        }
+           });
+
 
 
 
