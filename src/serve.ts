@@ -2,7 +2,6 @@ import 'dotenv/config'
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
-import { release } from 'node:os'
 
 const port = 3000
 const app = express()
@@ -65,26 +64,35 @@ app.post('/movies', async (req, res) => {
     }
 })
 
-app.put("/movies/:id", async (req, res) => {
-  const id = Number(req.params.id);
+app.put('/movies/:id', async (req, res) => {
+        const id = Number(req.params.id)
 
-  const movie = await prisma.movies.update({
-    where: {
-      id
-    },
-    data: {
-      release_date: new Date(req.body.release_date)
-    }
+        try {
+                const result = await prisma.movies.updateMany({
+                        where: { id },
+                        data: {
+                                release_date: new Date(req.body.release_date),
+                        },
+                })
 
-   
-  });
+                if (result.count === 0) {
+                        return res.status(404).json({ error: 'Movie not found' })
+                }
 
-  if (!movie) {
-    return res.status(404).json({ error: "Movie not found" });
-  }
+                const updatedMovie = await prisma.movies.findUnique({
+                        where: { id },
+                })
 
-   res.status(200).json(movie);
+                return res.status(200).json(updatedMovie)
+        } catch (error) {
+                return res.status(500).json({
+                        error: 'An error occurred while updating the movie.',
+                })
+        }
 })
+
+
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
