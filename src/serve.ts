@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { release } from 'node:os'
 
 const port = 3000
 const app = express()
@@ -62,6 +63,27 @@ app.post('/movies', async (req, res) => {
             error: 'An error occurred while creating the movie.',
         })
     }
+})
+
+app.put("/movies/:id", async (req, res) => {
+  const id = Number(req.params.id);
+
+  const movie = await prisma.movies.update({
+    where: {
+      id
+    },
+    data: {
+      release_date: new Date(req.body.release_date)
+    }
+
+   
+  });
+
+  if (!movie) {
+    return res.status(404).json({ error: "Movie not found" });
+  }
+
+   res.status(200).json(movie);
 })
 
 app.listen(port, () => {
