@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx tsx watch src/serve.ts",
+    "start": "node dist/serve.js",
+    "build": "tsc",
     "format": "prettier --write src/**/*.ts"
   },
   "keywords": [],

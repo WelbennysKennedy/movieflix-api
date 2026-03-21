@@ -1,0 +1,264 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de Filmes",
+        "description": "API para gerenciamento de filmes",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/movies": {
+            "get": {
+                "summary": "Obter todos os filmes",
+                "responses": {
+                    "200": {
+                        "description": "Retorna uma lista de filmes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Movie"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movies/{id}": {
+            "delete": {
+                "summary": "Remover um filme",
+                "description": "Remove o filme com o ID informado.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID do filme a ser removido",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Filme removido com sucesso"
+                    },
+                    "404": {
+                        "description": "Filme não encontrado"
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Atualizar um filme existente",
+                "description": "Atualiza todos os campos principais do filme. O corpo deve ser um JSON valido e conter title, genre_id, language_id, oscar_count e release_date.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID do filme a ser atualizado",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "description": "Envie apenas os campos que deseja atualizar. Todos os campos sao opcionais.",
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "title": "Cisne negro",
+                                "genre_id": 5,
+                                "language_id": 2,
+                                "oscar_count": 1,
+                                "release_date": "2011-02-04"
+                            },
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateMovieInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Filme atualizado com sucesso"
+                    },
+                    "400": {
+                        "description": "JSON invalido ou campos enviados em formato incorreto",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "invalidJson": {
+                                        "summary": "JSON invalido",
+                                        "value": {
+                                            "error": "Invalid JSON. Use double quotes in property names and string values.",
+                                            "example": {
+                                                "title": "Cisne negro",
+                                                "genre_id": 5,
+                                                "language_id": 2,
+                                                "oscar_count": 1,
+                                                "release_date": "2011-02-04"
+                                            }
+                                        }
+                                    },
+                                    "invalidField": {
+                                        "summary": "Campo faltando ou invalido",
+                                        "value": {
+                                            "error": "Field title must be a non-empty string."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Filme não encontrado"
+                    },
+                    "409": {
+                        "description": "Ja existe outro filme com o mesmo titulo"
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor"
+                    }
+                }
+            }
+        },
+        "/movies/{genreName}": {
+            "get": {
+                "summary": "Obter filmes por gênero",
+                "description": "Retorna uma lista de filmes que pertencem ao gênero especificado.",
+                "parameters": [
+                    {
+                        "name": "genreName",
+                        "in": "path",
+                        "required": true,
+                        "description": "Nome do gênero para filtrar os filmes",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Retorna uma lista de filmes do gênero especificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Movie"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Gênero não encontrado"
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Movie": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "ID do filme"
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Título do filme"
+                    },
+                    "genre": {
+                        "type": "string",
+                        "description": "Gênero do filme"
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "Idioma do filme"
+                    },
+                    "oscar_count": {
+                        "type": "integer",
+                        "description": "Quantidade de Oscars ganhos pelo filme"
+                    },
+                    "release_date": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Data de lançamento do filme"
+                    }
+                }
+            },
+            "MovieInput": {
+                "type": "object",
+                "required": [
+                    "title",
+                    "genre_id",
+                    "language_id",
+                    "oscar_count",
+                    "release_date"
+                ],
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Título do filme"
+                    },
+                    "genre_id": {
+                        "type": "integer",
+                        "description": "ID do gênero do filme"
+                    },
+                    "language_id": {
+                        "type": "integer",
+                        "description": "ID do idioma do filme"
+                    },
+                    "oscar_count": {
+                        "type": "integer",
+                        "description": "Quantidade de Oscars ganhos pelo filme"
+                    },
+                    "release_date": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Data de lançamento do filme"
+                    }
+                }
+            },
+            "UpdateMovieInput": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Título do filme"
+                    },
+                    "genre_id": {
+                        "type": "integer",
+                        "description": "ID do gênero do filme"
+                    },
+                    "language_id": {
+                        "type": "integer",
+                        "description": "ID do idioma do filme"
+                    },
+                    "oscar_count": {
+                        "type": "integer",
+                        "description": "Quantidade de Oscars ganhos pelo filme"
+                    },
+                    "release_date": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Data de lançamento do filme"
+                    }
+                }
+            }
+        }
+    }
+}
